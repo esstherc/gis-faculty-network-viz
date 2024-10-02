@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Network Graph</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+  <h3 class="oswald-heading">Global GIS Faculty Placement</h3>
+  <div class="color-switch">
+    <input value="private" name="switch" id="switch" type="checkbox" class="switch">
+    <label for="switch">
+      <span class="switch-x-text">Color by </span>
+      <span class="switch-x-toggletext">
+        <span class="switch-x-unchecked"><span class="switch-x-hiddenlabel">Unchecked: </span>Continent</span>
+        <span class="switch-x-checked"><span class="switch-x-hiddenlabel">Checked: </span>Country</span>
+      </span>
+    </label>
+  </div>
+
+  <div id="network"></div>
+  <div id="legend"></div>
+
+  <!-- Load the main JavaScript file -->
+  <script src="script.js"></script>
+</body>
+</html>
