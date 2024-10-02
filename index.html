@@ -8,9 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap" rel="stylesheet">
-
-  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script type="text/javascript" src="node_modules/vis-network/standalone/umd/vis-network.min.js"></script>
+  <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
 </head>
+
 <body>
   <h3 class="oswald-heading">Global GIS Faculty Placement</h3>
   <div class="color-switch">
@@ -25,9 +26,12 @@
   </div>
 
   <div id="network"></div>
+  <div id="node-popup" style="display:none; position:absolute; background-color:white; border:1px solid #ccc; padding:10px; z-index:1000;"></div>
   <div id="legend"></div>
+  
 
   <!-- Load the main JavaScript file -->
   <script src="script.js"></script>
+
 </body>
 </html>

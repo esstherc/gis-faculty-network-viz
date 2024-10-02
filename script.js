@@ -132,6 +132,48 @@ document.addEventListener("DOMContentLoaded", function() {
       // Initialize the network
       var network = new vis.Network(container, data, options);
 
+      // get pop-up element
+      var popup = document.getElementById("node-popup");
+      if (!popup) {
+        console.error("Popup element not found!");
+      }
+
+      // add hover event listener
+      network.on("hoverNode", function (params) {
+        // get node data
+        var node = network.body.nodes[params.node].options;
+        
+        // pop-up content
+        var content = `
+          <strong>Institution:</strong> ${node.label}<br>
+          <strong>Country:</strong> ${node.country}<br>
+          <strong>Continent:</strong> ${node.continent}<br>
+          <strong>Faculty Produced:</strong> ${node.value}
+        `;
+        
+        // set up pop-up content and position
+        popup.innerHTML = content;
+
+        var domPosition = network.canvasToDOM(params.pointer.canvas);
+        popup.style.left = (domPosition.x + 3) + 'px';  // 添加一些偏移
+        popup.style.top = (domPosition.y + 3) + 'px';
+        popup.style.display = 'block';
+      });
+
+      // add mouse leave node event listener
+      network.on("blurNode", function (params) {
+        if (popup) {
+          popup.style.display = 'none';
+        }
+      });
+
+      // add network graph drag start event listener
+      network.on("dragStart", function (params) {
+        if (popup) {
+          popup.style.display = 'none';
+        }
+      });
+
       function updateNodeColors(grouping) {
         var colorScheme = grouping === 'country' ? countryColors : continentColors;
         
@@ -186,11 +228,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
       network.setOptions({
         nodes: {
-          title: undefined, // 禁用默认工具提示
+          title: undefined, // disable default tooltip
         },
         interaction: {
           hover: true,
-          tooltipDelay: 200,
+          tooltipDelay: 100,
         }
       });
 
@@ -200,3 +242,106 @@ document.addEventListener("DOMContentLoaded", function() {
 // Keep the CSS styling
 document.getElementById('legend').style.maxHeight = '300px';
 document.getElementById('legend').style.overflowY = 'auto';
+
+var highlightActive = false;
+var originalColors = {};
+var connectedNodes = {};
+
+// 获取弹出框元素
+var popup = document.getElementById("node-popup");
+var popupContent = popup ? popup.querySelector('.callout-content') : null;
+
+network.on("hoverNode", function (params) {
+  highlightActive = true;
+  var selectedNode = params.node;
+  
+  // 获取与选中节点直接相连的所有节点
+  connectedNodes = network.getConnectedNodes(selectedNode);
+  connectedNodes.push(selectedNode); // 包括选中的节点自身
+  
+  // 存储原始颜色并设置新颜色
+  network.body.data.nodes.forEach(function(node) {
+    originalColors[node.id] = node.color;
+    if (connectedNodes.indexOf(node.id) === -1) {
+      // 如果节点不是直接相连的，设置为灰色
+      network.body.data.nodes.update({id: node.id, color: {background: '#D3D3D3', border: '#D3D3D3'}});
+    }
+  });
+  
+  // 处理边
+  network.body.data.edges.forEach(function(edge) {
+    originalColors[edge.id] = edge.color;
+    if (connectedNodes.indexOf(edge.from) === -1 || connectedNodes.indexOf(edge.to) === -1) {
+      // 如果边的两端有任一个不在直接相连的节点中，设置为灰色
+      network.body.data.edges.update({id: edge.id, color: {color: '#D3D3D3', highlight: '#D3D3D3'}});
+    }
+  });
+
+  // 更新网络图
+  network.redraw();
+
+  // 弹出信息框逻辑
+  if (popup && popupContent) {
+    var node = network.body.nodes[selectedNode].options;
+    
+    var content = `
+      <strong>${node.label}</strong><br>
+      ${node.country}<br>
+      ${node.continent}
+    `;
+    
+    popupContent.innerHTML = content;
+
+    var nodePosition = network.getPositions([selectedNode])[selectedNode];
+    var domPosition = network.canvasToDOM(nodePosition);
+
+    popup.style.left = (domPosition.x - popup.offsetWidth / 2) + 'px';
+    popup.style.top = (domPosition.y - popup.offsetHeight - 15) + 'px';
+    popup.style.display = 'block';
+  }
+});
+
+network.on("blurNode", function (params) {
+  if (highlightActive) {
+    // 恢复节点颜色
+    network.body.data.nodes.forEach(function(node) {
+      if (originalColors[node.id]) {
+        network.body.data.nodes.update({id: node.id, color: originalColors[node.id]});
+      }
+    });
+    
+    // 恢复边的颜色
+    network.body.data.edges.forEach(function(edge) {
+      if (originalColors[edge.id]) {
+        network.body.data.edges.update({id: edge.id, color: originalColors[edge.id]});
+      }
+    });
+    
+    highlightActive = false;
+    network.redraw();
+  }
+  
+  // 隐藏弹出框
+  if (popup) {
+    popup.style.display = 'none';
+  }
+});
+
+// 在网络图初始化后保存原始颜色
+network.on("afterDrawing", function (ctx) {
+  if (Object.keys(originalColors).length === 0) {
+    network.body.data.nodes.forEach(function(node) {
+      originalColors[node.id] = node.color;
+    });
+    network.body.data.edges.forEach(function(edge) {
+      originalColors[edge.id] = edge.color;
+    });
+  }
+});
+
+// 添加网络图拖动开始事件监听器
+network.on("dragStart", function () {
+  if (popup) {
+    popup.style.display = 'none';
+  }
+});
