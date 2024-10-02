@@ -1,0 +1,8 @@
+[
+    { "id": 1, "label": "Institution A", "abbr": "A", "continent": "North America", "country": "USA", "count_value": 15 },
+    { "id": 2, "label": "Institution B", "abbr": "B", "continent": "Europe", "country": "UK", "count_value": 30 },
+    { "id": 3, "label": "Institution C", "abbr": "C", "continent": "Asia", "country": "China", "count_value": 45 },
+    { "id": 4, "label": "Institution D", "abbr": "D", "continent": "Oceania", "country": "Australia", "count_value":24 },
+    { "id": 5, "label": "Institution E", "abbr": "E", "continent": "South America", "country": "Brazil", "count_value":18 },
+    { "id": 6, "label": "Institution F", "abbr": "F", "continent": "Africa", "country": "South Africa", "count_value": 21 }
+  ]
